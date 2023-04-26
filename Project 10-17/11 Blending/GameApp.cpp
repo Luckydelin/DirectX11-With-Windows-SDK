@@ -95,8 +95,8 @@ void GameApp::DrawScene()
     // ******************
     // 1. 绘制不透明对象
     //
-    m_pd3dImmediateContext->RSSetState(nullptr);
-    m_pd3dImmediateContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
+    m_pd3dImmediateContext->RSSetState(nullptr);//默认操作，面填充，三角形 顺时针为正面，启用三角形背面剔除
+    m_pd3dImmediateContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);//不进行混合操作
 
     for (auto& wall : m_Walls)
         wall.Draw(m_pd3dImmediateContext.Get());
@@ -105,8 +105,8 @@ void GameApp::DrawScene()
     // ******************
     // 2. 绘制透明对象
     //
-    m_pd3dImmediateContext->RSSetState(RenderStates::RSNoCull.Get());
-    m_pd3dImmediateContext->OMSetBlendState(RenderStates::BSTransparent.Get(), nullptr, 0xFFFFFFFF);
+    m_pd3dImmediateContext->RSSetState(RenderStates::RSNoCull.Get());//无背面剔除模式
+    m_pd3dImmediateContext->OMSetBlendState(RenderStates::BSAdditive.Get(), nullptr, 0xFFFFFFFF);//透明混合操作
 
     // 篱笆盒稍微抬起一点高度
     Transform& wireFrameTransform = m_WireFence.GetTransform();

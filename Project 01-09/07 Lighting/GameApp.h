@@ -15,7 +15,7 @@ public:
         DirectX::XMMATRIX view;
         DirectX::XMMATRIX proj;
         DirectX::XMMATRIX worldInvTranspose;
-        
+
     };
 
     struct PSConstantBuffer
@@ -25,6 +25,7 @@ public:
         SpotLight spotLight;
         Material material;
         DirectX::XMFLOAT4 eyePos;
+        DirectX::XMMATRIX rotationZ;
     };
 
 

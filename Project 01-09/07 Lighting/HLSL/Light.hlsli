@@ -16,6 +16,7 @@ cbuffer PSConstantBuffer : register(b1)
     Material g_Material;
     float3 g_EyePosW;
     float g_Pad;
+    matrix g_rotationZ;//new 
 }
 
 

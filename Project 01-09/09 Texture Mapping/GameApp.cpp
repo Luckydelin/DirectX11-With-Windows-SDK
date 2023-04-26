@@ -47,6 +47,17 @@ void GameApp::UpdateScene(float dt)
             "Box",
             "Fire Anim"
         };
+
+        static float phi2 = 0.0f;
+        static float angle = 0.1f;
+        phi2 -= angle;
+        XMMATRIX texMat = XMMatrixTranslation(-0.5f, -0.5f, 0.0f) * XMMatrixRotationZ(phi2) * XMMatrixTranslation(0.5f, 0.5f, 0.0f);
+        m_VSConstantBuffer.g_RotationMatrix = XMMatrixTranspose(texMat);
+
+        ImGui::Text("Phi: %.4f degrees", XMConvertToDegrees(angle));
+        ImGui::SliderFloat("##1", &angle, 0, 0.001f, "");     // 不显示文字，但避免重复的标签
+
+
         if (ImGui::Combo("Mode", &curr_mode_item, mode_strs, ARRAYSIZE(mode_strs)))
         {
             if (curr_mode_item == 0)
@@ -76,6 +87,8 @@ void GameApp::UpdateScene(float dt)
     ImGui::End();
     ImGui::Render();
 
+    m_pd3dImmediateContext->RSSetState(m_pRSWireframe.Get() );
+
     if (m_CurrMode == ShowMode::WoodCrate)
     {
         static float phi = 0.0f, theta = 0.0f;
@@ -83,6 +96,8 @@ void GameApp::UpdateScene(float dt)
         XMMATRIX W = XMMatrixRotationX(phi) * XMMatrixRotationY(theta);
         m_VSConstantBuffer.world = XMMatrixTranspose(W);
         m_VSConstantBuffer.worldInvTranspose = XMMatrixTranspose(InverseTranspose(W));
+        
+        
 
         // 更新常量缓冲区，让立方体转起来
         D3D11_MAPPED_SUBRESOURCE mappedData;
@@ -198,7 +213,17 @@ bool GameApp::InitResource()
     sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
     HR(m_pd3dDevice->CreateSamplerState(&sampDesc, m_pSamplerState.GetAddressOf()));
 
-    
+    // ******************
+    // 初始化光栅化状态
+    //
+    D3D11_RASTERIZER_DESC rasterizerDesc;
+    ZeroMemory(&rasterizerDesc, sizeof(rasterizerDesc));
+    rasterizerDesc.FillMode = D3D11_FILL_WIREFRAME;//D3D11_FILL_WIREFRAME //D3D11_FILL_WIREFRAME
+    rasterizerDesc.CullMode = D3D11_CULL_NONE;
+    rasterizerDesc.FrontCounterClockwise = false;
+    rasterizerDesc.DepthClipEnable = true;
+    HR(m_pd3dDevice->CreateRasterizerState(&rasterizerDesc, m_pRSWireframe.GetAddressOf()));
+
     // ******************
     // 初始化常量缓冲区的值
     //

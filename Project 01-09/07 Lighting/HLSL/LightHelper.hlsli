@@ -52,7 +52,7 @@ struct Material
 
 
 void ComputeDirectionalLight(Material mat, DirectionalLight L,
-    float3 normal, float3 toEye,
+    float3 normal, float3 toEye,matrix g_rotationZ,//new
     out float4 ambient,
     out float4 diffuse,
     out float4 spec)
@@ -61,6 +61,9 @@ void ComputeDirectionalLight(Material mat, DirectionalLight L,
     ambient = float4(0.0f, 0.0f, 0.0f, 0.0f);
     diffuse = float4(0.0f, 0.0f, 0.0f, 0.0f);
     spec = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+    //绕z轴旋转平行光
+    L.direction = mul(float4(L.direction,0.0f), g_rotationZ).xyz;//new
 
     // 光向量与照射方向相反
     float3 lightVec = -L.direction;

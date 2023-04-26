@@ -40,11 +40,17 @@ void GameApp::OnResize()
 
 void GameApp::UpdateScene(float dt)
 {
-    static float phi = 0.0f, theta = 0.0f;
-    phi += 0.3f * dt, theta += 0.37f * dt;
+    static float phi = 0.3f, theta = 0.3f;
+    //phi += 0.3f * dt, theta += 0.37f * dt;
     XMMATRIX W = XMMatrixRotationX(phi) * XMMatrixRotationY(theta);
     m_VSConstantBuffer.world = XMMatrixTranspose(W);
     m_VSConstantBuffer.worldInvTranspose = XMMatrixTranspose(InverseTranspose(W));
+
+    static float phi2 = 0.0001f;
+    static float rotationIntensity = 0.001f;
+    phi2 += rotationIntensity;
+    XMMATRIX W1 = XMMatrixRotationZ(phi2);
+    m_PSConstantBuffer.rotationZ = XMMatrixTranspose(W1);
 
     if (ImGui::Begin("Lighting"))
     {
@@ -74,7 +80,7 @@ void GameApp::UpdateScene(float dt)
         ImGui::ColorEdit3("Diffuse", &m_PSConstantBuffer.material.diffuse.x);
         ImGui::ColorEdit3("Specular", &m_PSConstantBuffer.material.specular.x);
         ImGui::PopID();
-
+        ImGui::SliderFloat("rotationIntensity", &rotationIntensity, 0,0.01, "");
         static int curr_light_item = 0;
         static const char* light_modes[] = {
             "Directional Light",
@@ -228,6 +234,7 @@ bool GameApp::InitResource()
     m_VSConstantBuffer.proj = XMMatrixTranspose(XMMatrixPerspectiveFovLH(XM_PIDIV2, AspectRatio(), 1.0f, 1000.0f));
     m_VSConstantBuffer.worldInvTranspose = XMMatrixIdentity();
     
+    
     // 初始化用于PS的常量缓冲区的值
     m_PSConstantBuffer.material.ambient = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.0f);
     m_PSConstantBuffer.material.diffuse = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -236,6 +243,7 @@ bool GameApp::InitResource()
     m_PSConstantBuffer.dirLight = m_DirLight;
     // 注意不要忘记设置此处的观察位置，否则高亮部分会有问题
     m_PSConstantBuffer.eyePos = XMFLOAT4(0.0f, 0.0f, -5.0f, 0.0f);
+    m_PSConstantBuffer.rotationZ = XMMatrixTranspose(XMMatrixRotationZ(0));
 
     // 更新PS常量缓冲区资源
     D3D11_MAPPED_SUBRESOURCE mappedData;
